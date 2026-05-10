@@ -3,8 +3,6 @@ name: Full Tests CI
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 jobs:
   tests:
@@ -12,35 +10,34 @@ jobs:
 
     steps:
       # -------------------------
-      # DEBUG REAL DO SECRET (CORRIGIDO)
+      # DEBUG DO SECRET (VERIFICA SE EXISTE)
       # -------------------------
       - name: Debug secret
         run: |
           echo "Verificando secret..."
-          if [ -z "$TESTE" ]; then
+          if [ -z "${{ secrets.TESTE }}" ]; then
             echo "❌ SECRET TESTE NÃO ENCONTRADO"
             exit 1
           else
             echo "✅ SECRET OK"
           fi
-        env:
-          TESTE: ${{ secrets.TESTE }}
 
       # -------------------------
-      # CHECKOUT TESTES
+      # CHECKOUT DO REPO DE TESTES (PÚBLICO)
       # -------------------------
       - name: Checkout testes
         uses: actions/checkout@v4
 
       # -------------------------
-      # CHECKOUT APP PRIVADA
+      # CHECKOUT DO REPO PRIVADO (APP)
       # -------------------------
       - name: Checkout app privada
         uses: actions/checkout@v4
         with:
           repository: LeidanDev/testePrivado
-          token: ${{ secrets.TESTEREPO }}
+          token: ${{ secrets.TESTE }}
           path: app
+          persist-credentials: false
 
       # -------------------------
       # SETUP .NET
@@ -82,7 +79,7 @@ jobs:
           npm run dev &
 
       # -------------------------
-      # WAIT
+      # WAIT FRONTEND
       # -------------------------
       - name: Instalar wait-on
         run: npm install -g wait-on
