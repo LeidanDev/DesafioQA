@@ -12,19 +12,22 @@ jobs:
 
     steps:
       # -------------------------
-      # DEBUG DO SECRET (IMPORTANTE)
+      # DEBUG REAL DO SECRET (CORRIGIDO)
       # -------------------------
       - name: Debug secret
         run: |
-          if [ -z "${{ secrets.TESTE }}" ]; then
+          echo "Verificando secret..."
+          if [ -z "$TESTE" ]; then
             echo "❌ SECRET TESTE NÃO ENCONTRADO"
             exit 1
           else
             echo "✅ SECRET OK"
           fi
+        env:
+          TESTE: ${{ secrets.TESTE }}
 
       # -------------------------
-      # CHECKOUT TESTES (REPO PÚBLICO)
+      # CHECKOUT TESTES
       # -------------------------
       - name: Checkout testes
         uses: actions/checkout@v4
@@ -79,7 +82,7 @@ jobs:
           npm run dev &
 
       # -------------------------
-      # ESPERAR FRONTEND
+      # WAIT
       # -------------------------
       - name: Instalar wait-on
         run: npm install -g wait-on
@@ -88,7 +91,7 @@ jobs:
         run: wait-on http://localhost:5173
 
       # -------------------------
-      # PLAYWRIGHT TESTS
+      # PLAYWRIGHT
       # -------------------------
       - name: Instalar dependências testes
         run: npm install
