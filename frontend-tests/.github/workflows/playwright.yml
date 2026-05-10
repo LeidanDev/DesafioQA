@@ -1,27 +1,89 @@
-name: Playwright Tests
+name: Full Tests
+
 on:
   push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+
 jobs:
-  test:
-    timeout-minutes: 60
+  tests:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      # -------------------------
+      # CHECKOUT TESTES (repo público)
+      # -------------------------
+      - name: Checkout testes
+        uses: actions/checkout@v4
+
+      # -------------------------
+      # CHECKOUT APP PRIVADA
+      # -------------------------
+      - name: Checkout app privada
+        uses: actions/checkout@v4
+        with:
+          repository: LeidanDev/testePrivado
+          token: ${{ secrets.TESTE }}
+          path: app
+
+      # -------------------------
+      # SETUP .NET
+      # -------------------------
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # -------------------------
+      # BACKEND TESTS
+      # -------------------------
+      - name: Restore backend
+        run: |
+          cd app/backend
+          dotnet restore
+
+      - name: Rodar backend tests
+        run: |
+          cd app/backend
+          dotnet test
+
+      # -------------------------
+      # NODE
+      # -------------------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # -------------------------
+      # FRONTEND
+      # -------------------------
+      - name: Instalar frontend
+        run: |
+          cd app/frontend
+          npm install
+
+      - name: Subir frontend
+        run: |
+          cd app/frontend
+          npm run dev &
+      
+      # -------------------------
+      # ESPERAR FRONTEND
+      # -------------------------
+      - name: Instalar wait-on
+        run: npm install -g wait-on
+
+      - name: Esperar frontend
+        run: wait-on http://localhost:5173
+
+      # -------------------------
+      # PLAYWRIGHT
+      # -------------------------
+      - name: Instalar dependências testes
+        run: npm install
+
+      - name: Instalar browsers
+        run: npx playwright install --with-deps
+
+      - name: Rodar Playwright
+        run: npx playwright test
