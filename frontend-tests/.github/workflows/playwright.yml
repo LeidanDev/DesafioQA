@@ -1,8 +1,10 @@
-name: Full Tests
+name: Full Tests CI
 
 on:
   push:
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   tests:
@@ -10,13 +12,25 @@ jobs:
 
     steps:
       # -------------------------
-      # CHECKOUT TESTES (repo público)
+      # DEBUG (garante que secret existe)
+      # -------------------------
+      - name: Debug secret
+        run: |
+          if [ -z "${{ secrets.TESTE }}" ]; then
+            echo "❌ SECRET TESTE NÃO ENCONTRADO"
+            exit 1
+          else
+            echo "✅ SECRET OK"
+          fi
+
+      # -------------------------
+      # CHECKOUT REPO TESTES (PÚBLICO)
       # -------------------------
       - name: Checkout testes
         uses: actions/checkout@v4
 
       # -------------------------
-      # CHECKOUT APP PRIVADA
+      # CHECKOUT REPO PRIVADO (APP)
       # -------------------------
       - name: Checkout app privada
         uses: actions/checkout@v4
@@ -33,9 +47,6 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      # -------------------------
-      # BACKEND TESTS
-      # -------------------------
       - name: Restore backend
         run: |
           cd app/backend
@@ -47,7 +58,7 @@ jobs:
           dotnet test
 
       # -------------------------
-      # NODE
+      # SETUP NODE
       # -------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -66,9 +77,9 @@ jobs:
         run: |
           cd app/frontend
           npm run dev &
-      
+
       # -------------------------
-      # ESPERAR FRONTEND
+      # ESPERAR FRONTEND SUBIR
       # -------------------------
       - name: Instalar wait-on
         run: npm install -g wait-on
@@ -77,7 +88,7 @@ jobs:
         run: wait-on http://localhost:5173
 
       # -------------------------
-      # PLAYWRIGHT
+      # TESTES PLAYWRIGHT
       # -------------------------
       - name: Instalar dependências testes
         run: npm install
