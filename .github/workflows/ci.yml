@@ -1,0 +1,74 @@
+name: Full Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Repo público (testes)
+      - name: Checkout testes
+        uses: actions/checkout@v4
+
+      # Repo privado (app)
+      - name: Checkout app privada
+        uses: actions/checkout@v4
+        with:
+          repository: SEU_USUARIO/SEU_REPO_PRIVADO
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: app
+
+      # -------------------------
+      # .NET
+      # -------------------------
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore backend
+        run: |
+          cd app/backend
+          dotnet restore
+
+      - name: Rodar backend tests
+        run: |
+          cd app/backend
+          dotnet test
+
+      # -------------------------
+      # FRONTEND
+      # -------------------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar frontend
+        run: |
+          cd app/frontend
+          npm install
+
+      - name: Subir frontend
+        run: |
+          cd app/frontend
+          npm run dev &
+      
+      # espera frontend subir
+      - name: Esperar frontend
+        run: npx wait-on http://localhost:5173
+
+      # -------------------------
+      # PLAYWRIGHT
+      # -------------------------
+      - name: Instalar dependências testes
+        run: npm install
+
+      - name: Instalar browsers
+        run: npx playwright install --with-deps
+
+      - name: Rodar Playwright
+        run: npx playwright test
