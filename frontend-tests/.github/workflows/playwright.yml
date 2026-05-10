@@ -10,7 +10,16 @@ jobs:
 
     steps:
       # -------------------------
-      # DEBUG DO SECRET (VERIFICA SE EXISTE)
+      # CHECKOUT REPO DE TESTES (PÚBLICO)
+      # -------------------------
+      - name: Checkout testes
+        uses: actions/checkout@v4
+        with:
+          repository: LeidanDev/testePrivado
+          token: ${{ secrets.TESTEREPO }}
+
+      # -------------------------
+      # DEBUG SECRET (VALIDAÇÃO)
       # -------------------------
       - name: Debug secret
         run: |
@@ -23,19 +32,13 @@ jobs:
           fi
 
       # -------------------------
-      # CHECKOUT DO REPO DE TESTES (PÚBLICO)
-      # -------------------------
-      - name: Checkout testes
-        uses: actions/checkout@v4
-
-      # -------------------------
-      # CHECKOUT DO REPO PRIVADO (APP)
+      # CHECKOUT REPO PRIVADO (APP)
       # -------------------------
       - name: Checkout app privada
         uses: actions/checkout@v4
         with:
           repository: LeidanDev/testePrivado
-          token: ${{ secrets.TESTEREPO }}
+          token: ${{ secrets.TESTE }}
           path: app
           persist-credentials: false
 
@@ -88,7 +91,7 @@ jobs:
         run: wait-on http://localhost:5173
 
       # -------------------------
-      # PLAYWRIGHT
+      # PLAYWRIGHT TESTS
       # -------------------------
       - name: Instalar dependências testes
         run: npm install
