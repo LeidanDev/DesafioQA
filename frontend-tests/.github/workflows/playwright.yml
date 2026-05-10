@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: LeidanDev/testePrivado
-          token: ${{ secrets.TESTE }}
+          token: ${{ secrets.TESTEREPO }}
           path: app
           persist-credentials: false
 
