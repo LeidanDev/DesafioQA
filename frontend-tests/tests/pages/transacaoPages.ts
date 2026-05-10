@@ -1,40 +1,4 @@
-// import { Page } from '@playwright/test'
 
-// export class TransacaoPages {
-//   constructor(private page: Page) {}
-
-//   async goto() {
-//     await this.page.goto('http://localhost:5173/transacoes')
-//   }
-
-//   async createTransaction(data: {
-//     descricao: string
-//     valor: string
-//     tipo: string
-//     categoria: string
-//     pessoa: string
-//   }) {
-//     await this.page.click('text=Adicionar Transação')
-
-//     await this.page.fill('input[name="descricao"]', data.descricao)
-//     await this.page.fill('input[name="valor"]', data.valor)
-
-//     const hoje = new Date().toISOString().split('T')[0]
-//     await this.page.fill('input[name="data"]', hoje)
-
-//     await this.page.selectOption('select[name="tipo"]', data.tipo)
-
-//     // pessoa (CORRIGIDO)
-//     await this.page.fill('input[placeholder="Pesquisar pessoas..."]', data.pessoa)
-//     await this.page.click(`text=${data.pessoa}`)
-
-//     // categoria (CORRIGIDO)
-//     await this.page.fill('input[placeholder="Pesquisar categorias..."]', data.categoria)
-//     await this.page.click(`text=${data.categoria}`)
-
-//     await this.page.click('text=Salvar')
-//   }
-// }
 
 import { Page } from '@playwright/test'
 
